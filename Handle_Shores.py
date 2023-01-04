@@ -45,10 +45,18 @@ def insert(user,categoria,titulo,conteudo,estado):
     """
     Função que insere as tarefas no ficheiro das Shores
     """
+    
+    #calculo de id consoante a ultima tarefa
+    shores = readShores()
+    shores.reverse()
+    campos = shores[0].split(";")
+    id = int(campos[0]) + 1
+
     #Criação da linha a inserir
     conteudo.replace("\n","(\)")
-    texto = str((datetime.now()).strftime("%d-%m-%Y %H:%M:%S")) + ";" + user +";" + estado + ";" + categoria + ";" + titulo + ";" + conteudo + "\n"
+    texto =str(id) + ";" + str((datetime.now()).strftime("%d-%m-%Y %H:%M:%S")) + ";" + user +";" + estado + ";" + categoria + ";" + titulo + ";" + conteudo + "\n"
     
+    #Escrita da tarefa
     checkDirectorie()
     file = open(path,"a", encoding="utf-8")
     file.write(texto)
