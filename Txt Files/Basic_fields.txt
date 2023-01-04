@@ -1,1 +1,1 @@
-id;data hora; user; estado; categoria; titulo; conteudo
+id;data hora; user; estado; categoria; titulo; conteudo; comentario

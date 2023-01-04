@@ -41,7 +41,7 @@ def checkDirectorie():
         file.close()
 
 
-def insert(user,categoria,titulo,conteudo,estado):
+def insert(user,categoria,titulo,conteudo,estado, data_Prazo):
     """
     Função que insere as tarefas no ficheiro das Shores
     """
@@ -54,20 +54,13 @@ def insert(user,categoria,titulo,conteudo,estado):
 
     #Criação da linha a inserir
     conteudo.replace("\n","(\)")
-    texto =str(id) + ";" + str((datetime.now()).strftime("%d-%m-%Y %H:%M:%S")) + ";" + user +";" + estado + ";" + categoria + ";" + titulo + ";" + conteudo + "\n"
+    texto =str(id) + ";" + str((datetime.now()).strftime("%d-%m-%Y %H:%M:%S")) + ";" + user +";" + estado + ";" + data_Prazo + ";"  + categoria + ";" + titulo + ";" + conteudo + "\n"
     
     #Escrita da tarefa
     checkDirectorie()
     file = open(path,"a", encoding="utf-8")
     file.write(texto)
     file.close()
-
-def edit(user,titulo,data_hora,campo):
-    shores = readShores()
-    for i in range(len(shores)):
-        campos = shores[i].split(";")
-        if not (user == str(campos[1]) and titulo == str(campos[4]) and data_hora == str(campos[0])):
-            print()
 
 
 def eliminate(user,titulo,data_hora):
