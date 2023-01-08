@@ -1,4 +1,0 @@
-Admin;123;1
-Miguel;Comida;2
-Comida2002;Comida;3
-Bmfasssdasd!;;COmida;4
