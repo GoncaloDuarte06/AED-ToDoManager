@@ -13,7 +13,7 @@ import os
 from datetime import *
 
 
-path = "Txt Files\\Shores.txt"
+path = "Ficheiros\\Shores.txt"
 
 def readShores():
     """
