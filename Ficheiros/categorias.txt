@@ -1,5 +1,1 @@
-<<<<<<< HEAD
 desporto;categoria3;categoria4
-=======
-desporto;
->>>>>>> 0ad221c1f65e1137507892a174d47e73593442cb
