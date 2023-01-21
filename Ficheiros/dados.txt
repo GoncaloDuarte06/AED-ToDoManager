@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+Admin;123;1
+gsduarte;123;2
+=======
 Admin;123;1
 
 gsduarte;123;2
+>>>>>>> 0ad221c1f65e1137507892a174d47e73593442cb

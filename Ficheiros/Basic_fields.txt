@@ -1,1 +1,5 @@
+<<<<<<< HEAD
+id;data hora; user; estado; data prazo; categoria; titulo; conteudo
+=======
 id;data hora; user; estado; categoria; titulo; conteudo; comentario
+>>>>>>> 0ad221c1f65e1137507892a174d47e73593442cb

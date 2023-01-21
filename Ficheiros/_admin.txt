@@ -1,3 +1,39 @@
+<<<<<<< HEAD
+gsduarte;2023-01-13;01:09:44;Entrada
+gsduarte;2023-01-13;01:13:14;Entrada
+gsduarte;2023-01-21;12:24:12;Entrada
+gsduarte;2023-01-21;12:26:24;Entrada
+gsduarte;2023-01-21;12:27:30;Entrada
+gsduarte;2023-01-21;12:28:20;Entrada
+gsduarte;2023-01-21;12:33:44;Entrada
+gsduarte;2023-01-21;12:35:33;Entrada
+gsduarte;2023-01-21;12:38:21;Entrada
+gsduarte;2023-01-21;12:38:44;Entrada
+gsduarte;2023-01-21;12:39:52;Entrada
+gsduarte;2023-01-21;12:43:37;Entrada
+gsduarte;2023-01-21;12:45:22;Entrada
+gsduarte;2023-01-21;12:48:36;Entrada
+gsduarte;2023-01-21;12:50:29;Entrada
+gsduarte;2023-01-21;12:51:04;Entrada
+gsduarte;2023-01-21;12:51:55;Entrada
+gsduarte;2023-01-21;12:53:04;Entrada
+gsduarte;2023-01-21;12:55:32;Entrada
+gsduarte;2023-01-21;14:35:07;Entrada
+gsduarte;2023-01-21;14:36:01;Entrada
+gsduarte;2023-01-21;14:38:05;Entrada
+gsduarte;2023-01-21;14:39:55;Entrada
+gsduarte;2023-01-21;14:41:00;Entrada
+gsduarte;2023-01-21;14:44:36;Entrada
+gsduarte;2023-01-21;14:45:25;Entrada
+gsduarte;2023-01-21;14:46:26;Entrada
+gsduarte;2023-01-21;14:48:25;Entrada
+gsduarte;2023-01-21;14:54:27;Entrada
+gsduarte;2023-01-21;15:15:16;Entrada
+gsduarte;2023-01-21;15:15:34;Entrada
+gsduarte;2023-01-21;15:16:04;Entrada
+gsduarte;2023-01-21;15:16:24;Entrada
+gsduarte;2023-01-21;15:19:40;Entrada
+=======
 
 Admin;2023-01-11;15:26:39;Entrada
 Admin;2023-01-11;15:28:15;Entrada
@@ -19,3 +55,4 @@ gsduarte;2023-01-11;17:08:35;Entrada
 gsduarte;2023-01-11;17:09:06;Entrada
 gsduarte;2023-01-11;17:10:00;Entrada
 gsduarte;2023-01-11;17:12:21;Entrada
+>>>>>>> 0ad221c1f65e1137507892a174d47e73593442cb
