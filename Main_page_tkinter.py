@@ -8,6 +8,30 @@ from Handle_Shores import *
 class application:
     def __init__(self, master=None):
      pass
+    
+def ReadFiles(Path):
+    file = open(Path,"r",encoding="utf-8")
+    texto = file.readlines()
+    file.close
+    return texto 
+
+def createCategoria(nome):
+    file = open("Ficheiros\categorias.txt","a", encoding="utf-8")
+    file.write(";" +  nome)
+    file.close()
+
+def deleteCategoria(nome):
+    texto = ReadFiles("Ficheiros\categorias.txt")
+    categorias = str(texto[0]).split(";")
+    categorias_second = categorias.copy()
+    for i in range(len(categorias_second)):
+        print(i)
+        if str(categorias_second[i]) == nome:
+            categorias.pop(i) 
+    texto = ";".join(categorias)
+    file = open("Ficheiros\categorias.txt","w",encoding="utf-8")
+    file.write(texto)
+    file.close()
 
 def Criar_conta_TK():
     CriarWindow = Tk()   # Objeto da classe Toplevel, janela principal
@@ -251,8 +275,7 @@ def criarTarefa():
     window_criacao.geometry(f'{550}x{300}+{int(x2)}+{int(y2)}')
     window_criacao.focus_force()
     window_criacao.grab_set()
-    window_criacao.resizable(False,False)
-    window_criacao.overrideredirect(True) 
+    window_criacao.resizable(False,False) 
     window_criacao.title('Criação de tarefa')
     window_criacao.config(bg='#87CEFA')
 
@@ -274,8 +297,14 @@ def criarTarefa():
     lblcategorias.place(x=8, y=10)
 
     #Box
-    txtcategorias = Entry(window_criacao, width=20)
-    txtcategorias.place(x=10, y=30)
+    global listaCategorias
+    listaCategorias = []
+    TextoCategorias =ReadFiles("Ficheiros\categorias.txt")
+    listaCategorias.append("")
+    for i in str(TextoCategorias[0]).split(";"):
+        listaCategorias.append(i)
+    categorias = ttk.Combobox(window_criacao, values=listaCategorias, state="readonly")
+    categorias.place(x=10, y=30)
 
     txtconteudo = Entry(window_criacao, width=88)
     txtconteudo.place(x=10, y=80)
@@ -291,10 +320,14 @@ def criarTarefa():
     btn.place(x=395, y=245)
 
     #dropdownlist
-    lista = []
-    user = ttk.Combobox(window_criacao, values=lista)
+    global listaUsers 
+    listaUsers= []
+    TextoCategorias = ReadFiles("Ficheiros\dados.txt")
+    listaUsers.append("")
+    for i in TextoCategorias:
+        listaUsers.append(str(i).split(";")[0])
+    user = ttk.Combobox(window_criacao, values=listaUsers,state="readonly")
     user.place(x=399, y=30)
-
 
 
 window = Tk()

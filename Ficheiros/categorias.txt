@@ -1,1 +1,1 @@
-desporto;
+desporto;categoria3;categoria4
