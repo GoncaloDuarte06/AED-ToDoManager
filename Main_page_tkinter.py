@@ -8,7 +8,7 @@ from Handle_Shores import *
 class application:
     def __init__(self, master=None):
      pass
-    
+
 def ReadFiles(Path):
     file = open(Path,"r",encoding="utf-8")
     texto = file.readlines()
@@ -25,7 +25,6 @@ def deleteCategoria(nome):
     categorias = str(texto[0]).split(";")
     categorias_second = categorias.copy()
     for i in range(len(categorias_second)):
-        print(i)
         if str(categorias_second[i]) == nome:
             categorias.pop(i) 
     texto = ";".join(categorias)
@@ -197,6 +196,13 @@ def VoltarMenu(window_Tarefas):
     window_Tarefas.destroy()
     window.deiconify()
 
+def updateTreeview(tree,categoria, dataprazo):
+    shoresBruto = readShores()
+    for i in range(len(shoresBruto)):
+        campos = shoresBruto[i].split(";")
+        if campos[2] == userAutenticado.get() and categoria == "" and dataprazo == "":
+            tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
+        
 def Open_Tarefas():
     window.withdraw()
     Window_Tarefas = Toplevel() #Insere no topo do ecrã 
@@ -224,8 +230,11 @@ def Open_Tarefas():
     label1 = Label(lFrame, text="Categoria :", fg="black", font=("",10))
     label1.place(x = 10, y = 60)
     
+    texto = ReadFiles("Ficheiros\categorias.txt")
+    categorias = str(texto[0]).split(";")
+
     categoria = StringVar()
-    drop = ttk.Combobox(lFrame, textvariable= categoria, values= "", state="readonly", font=("",10))
+    drop = ttk.Combobox(lFrame, textvariable= categoria, values= categorias, state="readonly", font=("",10))
     drop.place(x = 80, y = 60)
 
 
@@ -253,19 +262,23 @@ def Open_Tarefas():
 
     #treeview
     
-    tree = ttk.Treeview(Window_Tarefas, height = 20, selectmode = "browse", columns = ("Titulo", "Estado", "Categoria","DataPrazo", "Conteudo"), show = "headings")
+    tree = ttk.Treeview(Window_Tarefas, height = 20, selectmode = "browse", columns = ("id","Titulo", "Estado", "Categoria","DataPrazo", "Conteudo"), show = "headings")
 
+    tree.column("id", stretch=NO, minwidth=0, width=0,   anchor="c")
     tree.column("Titulo", width = 200,   anchor="c")
     tree.column("Estado", width = 100,  anchor="c") 
     tree.column("Categoria", width = 150,   anchor="c")
     tree.column("DataPrazo", width = 150,  anchor="c") 
     tree.column("Conteudo", width = 200,   anchor="c")
+    tree.heading("id", text = "")
     tree.heading("Titulo", text = "Titulo")
     tree.heading("Estado", text = "Estado")
     tree.heading("Categoria", text = "Categoria")
     tree.heading("DataPrazo", text = "DataPrazo")
     tree.heading("Conteudo", text = "Conteudo")
     tree.place(x = 285, y = 81)
+
+    updateTreeview(tree, categoria.get(), DataPrazo.get())
 
 def criarTarefa():
     window_criacao = Toplevel() #Insere no topo do ecrã 
@@ -290,44 +303,45 @@ def criarTarefa():
     lbluser= Label(window_criacao,text= "USER",bg='#87CEFA', font=("helvetica", 8))
     lbluser.place(x=505, y=10)
 
-    lblcomentario= Label(window_criacao,text= "COMENTARIO",bg='#87CEFA', font=("helvetica", 8))
+    lblcomentario= Label(window_criacao,text= "CONTEUDO",bg='#87CEFA', font=("helvetica", 8))
     lblcomentario.place(x=7, y=110)
 
     lblcategorias= Label(window_criacao,text= "CATEGORIAS",bg='#87CEFA', font=("helvetica", 8))
     lblcategorias.place(x=8, y=10)
 
     #Box
-    global listaCategorias
-    listaCategorias = []
-    TextoCategorias =ReadFiles("Ficheiros\categorias.txt")
-    listaCategorias.append("")
-    for i in str(TextoCategorias[0]).split(";"):
-        listaCategorias.append(i)
-    categorias = ttk.Combobox(window_criacao, values=listaCategorias, state="readonly")
+    texto = ReadFiles("Ficheiros\categorias.txt")
+    categorias = str(texto[0]).split(";")
+    categoria = StringVar()
+    categorias = ttk.Combobox(window_criacao, values=categorias, state="readonly",textvariable=categoria)
     categorias.place(x=10, y=30)
 
-    txtconteudo = Entry(window_criacao, width=88)
-    txtconteudo.place(x=10, y=80)
+    titulo = StringVar()
+    txttitulo = Entry(window_criacao, width=88, textvariable=titulo)
+    txttitulo.place(x=10, y=80)
 
     txtmain = Text(window_criacao, width=66, height = 6)
     txtmain.place(x=10, y=130)
 
-    txtdatapz = Entry(window_criacao, width=20)
+    dataprazo = StringVar
+    txtdatapz = Entry(window_criacao, width=20, textvariable= dataprazo)
     txtdatapz.place(x=10, y=250)
-
-    #Button
-    btn=Button(window_criacao, width=20, text="CRIAR TAREFA")
-    btn.place(x=395, y=245)
 
     #dropdownlist
     global listaUsers 
     listaUsers= []
     TextoCategorias = ReadFiles("Ficheiros\dados.txt")
-    listaUsers.append("")
     for i in TextoCategorias:
         listaUsers.append(str(i).split(";")[0])
-    user = ttk.Combobox(window_criacao, values=listaUsers,state="readonly")
+
+    userCriacao =StringVar()
+    user = ttk.Combobox(window_criacao, values=listaUsers,state="readonly", textvariable = userCriacao )
     user.place(x=399, y=30)
+    
+    #Button
+    btn=Button(window_criacao, width=20, text="CRIAR TAREFA", command= lambda: insertTarefa(user.get(),categorias.get(),txttitulo.get(), txtmain.get(1.0,END),"Iniciada",txtdatapz.get()))
+    btn.place(x=395, y=245)
+
 
 
 window = Tk()

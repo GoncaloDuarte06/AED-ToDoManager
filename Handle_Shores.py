@@ -41,19 +41,26 @@ def checkDirectorie():
         file.close()
 
 
-def insert(user,categoria,titulo,conteudo,estado, data_Prazo):
+def insertTarefa(user,categoria,titulo,conteudo,estado,data_Prazo):
     """
     Função que insere as tarefas no ficheiro das Shores
     """
+    #Verifica o conteudo das variaveis
     
+
+
     #calculo de id consoante a ultima tarefa
     shores = readShores()
     shores.reverse()
     campos = shores[0].split(";")
-    id = int(campos[0]) + 1
+    if campos[0] == "":
+        id = 1
+    else:
+        id = int(campos[0]) + 1
 
     #Criação da linha a inserir
-    conteudo.replace("\n","(\)")
+    conteudo.strip()
+    conteudo = "(/)".join(conteudo.splitlines())
     texto =str(id) + ";" + str((datetime.now()).strftime("%d-%m-%Y %H:%M:%S")) + ";" + user +";" + estado + ";" + data_Prazo + ";"  + categoria + ";" + titulo + ";" + conteudo + "\n"
     
     #Escrita da tarefa
