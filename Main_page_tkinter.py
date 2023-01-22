@@ -196,13 +196,46 @@ def VoltarMenu(window_Tarefas):
     window_Tarefas.destroy()
     window.deiconify()
 
+
 def updateTreeview(tree,categoria, dataprazo):
+    if dataprazo != "":
+        #Check dataprazo
+                dataprazo = dataprazo.replace("/","-")
+                dataprazo = dataprazo.replace(".","-")
+                try:
+                    dataComp = datetime.strptime(dataprazo, "%d-%m-%Y")
+                except:
+                    messagebox.showwarning(title="Erro ao inserir a data", message="Não inseriu a data corretamente. Deve inserir o dia(dd) de seguida o mes(mm) e de seguida o ano(yyyy)")
+                    return 0
+
+    tree.delete(*tree.get_children())
     shoresBruto = readShores()
+    exists = False
+    existsUser = False
     for i in range(len(shoresBruto)):
         campos = shoresBruto[i].split(";")
-        if campos[2] == userAutenticado.get() and categoria == "" and dataprazo == "":
-            tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
-        
+        if campos[2] == userAutenticado.get():
+            existsUser = True
+            if categoria == "" and dataprazo == "":
+                tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
+                exists = True
+            elif categoria == campos[5].strip():
+                tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
+                exists = True
+            elif  dataprazo == campos[4].strip():
+                tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
+                exists = True
+            elif dataprazo == campos[4].strip() and categoria == campos[5].strip():
+                tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
+                exists = True
+    
+    if existsUser == False and exists == False:
+        messagebox.showwarning(title="User sem tarefas", message="Utilizador não tem tarefas")
+    elif exists == False:
+        messagebox.showwarning(title="Erro ao filtrar dados", message="Não existem tarefas que estejam dentro dos filtros selecionados")
+
+
+            
 def Open_Tarefas():
     window.withdraw()
     Window_Tarefas = Toplevel() #Insere no topo do ecrã 
@@ -215,7 +248,6 @@ def Open_Tarefas():
 
     barraMenu = Menu(Window_Tarefas)
     barraMenu.add_command(label = "Pagina Principal", command= lambda:VoltarMenu(Window_Tarefas))
-    barraMenu.add_command(label = "Gestão User", command= "")
     barraMenu.add_command(label = "Sair", command= Window_Tarefas.quit)
     Window_Tarefas.configure(menu=barraMenu)
 
@@ -232,6 +264,7 @@ def Open_Tarefas():
     
     texto = ReadFiles("Ficheiros\categorias.txt")
     categorias = str(texto[0]).split(";")
+    categorias.append("")
 
     categoria = StringVar()
     drop = ttk.Combobox(lFrame, textvariable= categoria, values= categorias, state="readonly", font=("",10))
@@ -249,11 +282,11 @@ def Open_Tarefas():
 
     #Botão filtrar
 
-    button_Filtrar = Button(lFrame,text="Filtrar", width= 20,height=1, font=("",10), bd=2,  command="")
+    button_Filtrar = Button(lFrame,text="Filtrar", width= 20,height=1, font=("",10), bd=2,  command=lambda : updateTreeview(tree, drop.get(), DataPrazo_Entry.get()))
     button_Filtrar.place(x = 50, y = 180)
 
     #Botão criar
-    button_Criar = Button(Window_Tarefas,text="Criar", width= 28,height=2, font=("",12), bd=2,  command=criarTarefa)
+    button_Criar = Button(Window_Tarefas,text="Criar", width= 28,height=2, font=("",12), bd=2,  command=lambda:criarTarefa(Window_Tarefas, tree, drop.get(), DataPrazo_Entry.get()))
     button_Criar.place(x = 15, y = 380)
 
     #Botão editar
@@ -280,7 +313,7 @@ def Open_Tarefas():
 
     updateTreeview(tree, categoria.get(), DataPrazo.get())
 
-def criarTarefa():
+def criarTarefa(window, tree, categoria2,Dataprazo):
     window_criacao = Toplevel() #Insere no topo do ecrã 
     window_criacao.title("Tarefas")
     x2 = (screenWidth/2) - (550/2)        # posição do canto superior esquerdo da window
@@ -339,7 +372,7 @@ def criarTarefa():
     user.place(x=399, y=30)
     
     #Button
-    btn=Button(window_criacao, width=20, text="CRIAR TAREFA", command= lambda: insertTarefa(user.get(),categorias.get(),txttitulo.get(), txtmain.get(1.0,END),"Iniciada",txtdatapz.get()))
+    btn=Button(window_criacao, width=20, text="CRIAR TAREFA", command= lambda: [insertTarefa(user.get(),categorias.get(),txttitulo.get(), txtmain.get(1.0,END),"Iniciada",txtdatapz.get(),window_criacao, window),updateTreeview(tree, categoria2, Dataprazo)])
     btn.place(x=395, y=245)
 
 

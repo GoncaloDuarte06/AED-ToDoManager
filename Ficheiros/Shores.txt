@@ -1,8 +1,10 @@
-1;04-01-2023 15:11:20;gsduarte;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
+1;04-01-2023 15:11:20;gsduarte;criada;04-10-2022;Desporto;Sub21;Tem que haver mais bolas
 2;04-01-2023 15:11:20;gsduarte;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
 3;04-01-2023 15:12:01;gsduarte;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
-4;04-01-2023 16:00:35;gsduarte;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
+4;04-01-2023 16:00:35;gsduarte;criada;05-10-2022;categoria4;Sub21;Tem que haver mais bolas
 5;04-01-2023 16:02:24;Admin;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
 6;04-01-2023 16:03:16;gsduarte;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
 7;04-01-2023 16:06:00;Admin;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
 8;04-01-2023 16:07:29;Admin;criada;05-10-2022;Desporto;Sub21;Tem que haver mais bolas
+9;22-01-2023 15:58:01;gsduarte2;Iniciada;23-02-2023;categoria3;12323;2312312312
+10;22-01-2023 16:00:10;gsduarte2;Iniciada;23-05-2023;Desporto;123;321312312312312312312312312
