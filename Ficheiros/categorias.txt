@@ -1,1 +1,1 @@
-Desporto;categoria3;categoria4
+Desporto;Trabalho;Entrega de Trabalho;Barbeiro;Receitas;Contabilidade;Reunir;Lazer;Limpeza Carro

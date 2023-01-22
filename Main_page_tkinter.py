@@ -1,38 +1,30 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk # treeview
+from datetime import date
 import os
 from Login_with_tkinter import *
 from Handle_Shores import *
-
+options = []
+estados = ["Iniciada","Progresso","Finalizado"]
 class application:
     def __init__(self, master=None):
      pass
 
-def ReadFiles(Path):
+def ReadFiles(Path):  
+    """
+        Função de leitura de ficheiro
+        input: Path(string)
+    """
     file = open(Path,"r",encoding="utf-8")
     texto = file.readlines()
     file.close
     return texto 
 
-def createCategoria(nome):
-    file = open("Ficheiros\categorias.txt","a", encoding="utf-8")
-    file.write(";" +  nome)
-    file.close()
-
-def deleteCategoria(nome):
-    texto = ReadFiles("Ficheiros\categorias.txt")
-    categorias = str(texto[0]).split(";")
-    categorias_second = categorias.copy()
-    for i in range(len(categorias_second)):
-        if str(categorias_second[i]) == nome:
-            categorias.pop(i) 
-    texto = ";".join(categorias)
-    file = open("Ficheiros\categorias.txt","w",encoding="utf-8")
-    file.write(texto)
-    file.close()
-
 def Criar_conta_TK():
+    """
+        Painel de criação de conta
+    """
     CriarWindow = Tk()   # Objeto da classe Toplevel, janela principal
     CriarWindow.title("Criar Conta")
     CriarWindow.resizable(False,False)
@@ -48,7 +40,7 @@ def Criar_conta_TK():
     
     # Label
     labelTitulo_Criar = Label(CriarWindow, text ="Criar uma conta",font = ("Helvetica", "20"))
-    labelTitulo_Criar.place(x=45, y= 30)
+    labelTitulo_Criar.place(x=95, y= 30)
     
     # Username
     labelUsersCriar = Label(CriarWindow, text ="Username:",font = ("Helvetica", "10"))
@@ -78,13 +70,16 @@ def Criar_conta_TK():
     btnCriarConta.place(x=110, y= 250) 
 
 def Login_tk():
-    
+    """
+    Função de pagina de login
+    """
     if userAutenticado.get() != "":     # SE JÁ EXISTE um user autenticado, a ideia é terminar sessão
         if userAutenticado.get() == "Admin":
             btnAdmin.destroy()
 
-        AdminTreeview_info(userAutenticado.get())
+        Admin_info(userAutenticado.get(),"Saida")
         userAutenticado.set("")
+        btnNotificacoes.destroy()
         btnVerAtividades.configure(state="disable")
         btnIniciarSessao.config(text = "Iniciar Sessão")
         global btnCriarConta
@@ -131,33 +126,61 @@ def Login_tk():
     btnValidar.place(x=110, y= 200) 
     
 def autenticarUser(userName, userPass, Log_window):
+    """
+    Função que autentica o user, com modificação do UI presnete consoante tipo de user
+    """
     global userAutenticado
     userAutenticado.set(validaConta(userName, userPass, Log_window))
     if userAutenticado.get() != "":
         btnIniciarSessao.config(text = "Terminar Sessão")
         btnVerAtividades.configure(state="active")
         btnCriarConta.destroy()
+        global btnNotificacoes
+        btnNotificacoes = Button(ctnCanvas, image= imagemNoti, width = 48, height = 48, command= lambda: Noti_criar(userAutenticado.get()))
+        btnNotificacoes.place(x=30, y=420)
     if userAutenticado.get() == "Admin":
         global btnAdmin
         btnAdmin = Button(PanelStatus, text = "Admin", width = 11, height = 4,font = ("Helvetica", "10"),command= AdminOpen)
         btnAdmin.place(x=270, y=12)
 
+def Categoria_Optionsadmin(Categoria):
+    """
+    Função de adicionar categoria em conjunto com modificação de lista interna
+    """
+    global options
+    options=[]
+    options=Adicionar_Categorias(Categoria)
+    dropdown_admin['values'] = options
+
+def Categoria_Removeadmin(Categoria):
+    """
+    Função de remover categoria em conjunto com modificação de lista interna
+    """
+    global options
+    options=[]
+    options=Remover_Categorias(Categoria)
+    dropdown_admin['values'] = options
+
 def AdminOpen():
-    window_admin = Tk()
+    """
+    Interface de Admin com algumas estastisticas e criação de categoria
+    """
+    window.withdraw()
+    window_admin = Toplevel() #Insere no topo do ecrã 
+    window_admin.title('Admin')                          
+    appHeight_admin = 365 
+    y_admin = (screenHeight/2) - (appHeight_admin/2)
+    window_admin.geometry(f'{appWidth}x{appHeight_admin}+{int(x)}+{int(y_admin)}')
+    window_admin.focus_force()
+    window_admin.grab_set()
     window_admin.resizable(False,False)
-    Admin_screen = window_admin.winfo_screenwidth()
-    Admin_heightscreen = window_admin.winfo_screenheight()
-    appWidth_admin = 1100                             # tamanho (pixeis) da window a criar 1100 / 700
-    appHeight_admin = 700 
-    x_admin = (Admin_screen/2) - (appWidth_admin/2)        # posição do canto superior esquerdo da window
-    y_admin = (Admin_heightscreen/2) - (appHeight_admin/2)
-    window_admin.geometry("{:.0f}x{:.0f}+{:.0f}+{:.0f}" .format(appWidth_admin, appHeight_admin, int(x_admin), int(y_admin)))
-    window_admin.title('Admin')
-    window_admin.focus_force()  # força o focus na window atual
-    window_admin.grab_set()        # Força que todos os eventos (p.e. clicar num button)  estejam enquadrados no componente atual (janela top)
+    window_admin.overrideredirect(True) 
+    
+    labelAdmin = Label(window_admin, text ="Gestor da Aplicação do Admin",font = ("Helvetica", "18"))
+    labelAdmin.place(x=10, y= 10)
     
     PanelStatus_admin = PanedWindow(window_admin, width=250, height=100, relief="sunken")
-    PanelStatus_admin.place(x=10, y=50)
+    PanelStatus_admin.place(x=40, y=80)
 
     # Username
     labelUsername = Label(PanelStatus_admin, text ="Username",font = ("Helvetica", "10"))
@@ -186,18 +209,65 @@ def AdminOpen():
     tree.heading("Hora", text = "Hora")
     tree.heading("Movimento", text = "Movimento")
     tree.place(x=5, y=5)
+    
+    panel_Categoria = PanedWindow(window_admin, height=140, width=250, relief="sunken")
+    panel_Categoria.place(x=40, y= 190)
 
-def FuncaoSair(window):
+    label_dropdown_admin = Label(panel_Categoria, text ="Catogoria:",font = ("Helvetica", "10"))
+    label_dropdown_admin.place(x=10, y= 12)
+
+    Filtrar_dropdown_admin = StringVar()
+    txt_dropdown_admin = Entry(panel_Categoria, width=25, textvariable=Filtrar_dropdown_admin)
+    txt_dropdown_admin.place(x=75, y= 15)
+
+    btn_Dropdown_adicionar = Button(panel_Categoria, text="Adicionar",font = ("Helvetica", "10"), width=11, height=2, command = lambda: Categoria_Optionsadmin(txt_dropdown_admin.get()))
+    btn_Dropdown_adicionar.place(x=20, y=45)
+
+    btn_Dropdown_remover = Button(panel_Categoria, text="Remover",font = ("Helvetica", "10"), width=11, height=2, command = lambda: Categoria_Removeadmin(categoria.get()))
+    btn_Dropdown_remover.place(x=130, y=45)
+
+    btnSair_admin = Button(window_admin, text = "Sair", width = 11, height = 4,font = ("Helvetica", "10"), command = lambda: VoltarMenu(window_admin))
+    btnSair_admin.place(y=280, x=950)
+
+    
+    texto = ReadFiles("Ficheiros\categorias.txt")
+    options = str(texto[0]).split(";")
+    global dropdown_admin
+    categoria = StringVar()
+    
+    dropdown_admin = ttk.Combobox(panel_Categoria, textvariable= categoria,values= options, state="readonly",width=35)
+    dropdown_admin.place(x = 5, y = 100)
+
+def FuncaoSair(window_):
+    
+    """
+    Função que sai da aplicação e termina sessão
+    """
     if userAutenticado.get() != "":
-        AdminTreeview_info(userAutenticado.get())
-    window.quit()
+        Admin_info(userAutenticado.get(),"Saida")
+    window_.quit()
+
+def FuncaoSair_noti(WindowPanned, btn):
+    """
+    Funçãpo que destroy panel das notificações
+    """
+    WindowPanned.destroy()
+    btn.destroy()
+    btnNotificacoes.configure(state="active")
 
 def VoltarMenu(window_Tarefas):
+    """
+        Função que retorna a menu da window
+    """
     window_Tarefas.destroy()
     window.deiconify()
 
-
-def updateTreeview(tree,categoria, dataprazo):
+def updateTreeview(tree,categoria, dataprazo, estado):
+    """
+    Função que atualiza a Treeview consoante os filtros dados
+    Valida a data devolvida pelo utilizador
+    
+    """
     if dataprazo != "":
         #Check dataprazo
                 dataprazo = dataprazo.replace("/","-")
@@ -214,41 +284,37 @@ def updateTreeview(tree,categoria, dataprazo):
     existsUser = False
     for i in range(len(shoresBruto)):
         campos = shoresBruto[i].split(";")
+        campos[7].strip()
+        campos[7] = " ".join(str(campos[7]).split("(/)"))
         if campos[2] == userAutenticado.get():
             existsUser = True
-            if categoria == "" and dataprazo == "":
+            if categoria == "" and dataprazo == "" and estado == "":
                 tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
                 exists = True
-            elif categoria == campos[5].strip():
+            elif categoria == campos[5].strip() or dataprazo == campos[4].strip() or estado == campos[3]:
                 tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
                 exists = True
-            elif  dataprazo == campos[4].strip():
-                tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
-                exists = True
-            elif dataprazo == campos[4].strip() and categoria == campos[5].strip():
-                tree.insert("","end", values = (campos[0],campos[6], campos[3], campos[5],campos[4],campos[7]))
-                exists = True
+
     
     if existsUser == False and exists == False:
         messagebox.showwarning(title="User sem tarefas", message="Utilizador não tem tarefas")
     elif exists == False:
         messagebox.showwarning(title="Erro ao filtrar dados", message="Não existem tarefas que estejam dentro dos filtros selecionados")
-
-
-            
+        
 def Open_Tarefas():
+    """
+    Função que cria a pagina de gestão de tarefas
+    """
     window.withdraw()
     Window_Tarefas = Toplevel() #Insere no topo do ecrã 
     Window_Tarefas.title("Tarefas")
     Window_Tarefas.geometry(f'{appWidth}x{appHeight}+{int(x)}+{int(y)}')
-    Window_Tarefas.focus_force()
-    Window_Tarefas.grab_set()
     Window_Tarefas.resizable(False,False)
     Window_Tarefas.overrideredirect(True) 
 
     barraMenu = Menu(Window_Tarefas)
     barraMenu.add_command(label = "Pagina Principal", command= lambda:VoltarMenu(Window_Tarefas))
-    barraMenu.add_command(label = "Sair", command= Window_Tarefas.quit)
+    barraMenu.add_command(label = "Sair", command= lambda:FuncaoSair(Window_Tarefas))
     Window_Tarefas.configure(menu=barraMenu)
 
     label1 = Label(Window_Tarefas, text="Gestão de tarefas", fg="black", font=("",40))
@@ -260,7 +326,7 @@ def Open_Tarefas():
     #Filtro categoria
     
     label1 = Label(lFrame, text="Categoria :", fg="black", font=("",10))
-    label1.place(x = 10, y = 60)
+    label1.place(x = 10, y = 20)
     
     texto = ReadFiles("Ficheiros\categorias.txt")
     categorias = str(texto[0]).split(";")
@@ -268,29 +334,40 @@ def Open_Tarefas():
 
     categoria = StringVar()
     drop = ttk.Combobox(lFrame, textvariable= categoria, values= categorias, state="readonly", font=("",10))
-    drop.place(x = 80, y = 60)
+    drop.place(x = 80, y = 20)
 
 
     #Filtro data prazo
 
     label2 = Label(lFrame, text="Data Prazo :", fg="black", font=("",10))
-    label2.place(x = 10, y = 120)
+    label2.place(x = 10, y = 80)
 
     DataPrazo=StringVar() #caso queiras escrever algo na entry/ else retira-se o textvariable e a variavel criada por esta linha
     DataPrazo_Entry = Entry(lFrame,width=21, textvariable=DataPrazo, font=("",10))
-    DataPrazo_Entry.place(x=90,y=123)
+    DataPrazo_Entry.place(x=90,y=83)
+
+
+    #Filtro Estado
+    
+    label1 = Label(lFrame, text="Estado :", fg="black", font=("",10))
+    label1.place(x = 10, y = 150)
+    
+    estados.append("")
+    categoria = StringVar()
+    dropEstado = ttk.Combobox(lFrame, textvariable= categoria, values= estados, state="readonly", font=("",10))
+    dropEstado.place(x = 80, y = 153)
 
     #Botão filtrar
 
-    button_Filtrar = Button(lFrame,text="Filtrar", width= 20,height=1, font=("",10), bd=2,  command=lambda : updateTreeview(tree, drop.get(), DataPrazo_Entry.get()))
-    button_Filtrar.place(x = 50, y = 180)
+    button_Filtrar = Button(lFrame,text="Filtrar", width= 20,height=1, font=("",10), bd=2,  command=lambda : updateTreeview(tree, drop.get(), DataPrazo_Entry.get(),dropEstado.get()))
+    button_Filtrar.place(x = 50, y = 220)
 
     #Botão criar
-    button_Criar = Button(Window_Tarefas,text="Criar", width= 28,height=2, font=("",12), bd=2,  command=lambda:criarTarefa(Window_Tarefas, tree, drop.get(), DataPrazo_Entry.get()))
+    button_Criar = Button(Window_Tarefas,text="Criar", width= 28,height=2, font=("",12), bd=2,  command=lambda:criarTarefa(Window_Tarefas, tree, drop.get(), DataPrazo_Entry.get(),dropEstado.get()))
     button_Criar.place(x = 15, y = 380)
 
     #Botão editar
-    button_Editar = Button(Window_Tarefas,text="Editar", width= 28,height=2, font=("",12), bd=2,  command="")
+    button_Editar = Button(Window_Tarefas,text="Editar", width= 28,height=2, font=("",12), bd=2,  command=lambda:detalheTarefa(tree))
     button_Editar.place(x = 15, y = 445)
 
     #treeview
@@ -311,9 +388,13 @@ def Open_Tarefas():
     tree.heading("Conteudo", text = "Conteudo")
     tree.place(x = 285, y = 81)
 
-    updateTreeview(tree, categoria.get(), DataPrazo.get())
+    updateTreeview(tree, categoria.get(), DataPrazo.get(),dropEstado.get())
 
-def criarTarefa(window, tree, categoria2,Dataprazo):
+def criarTarefa(window, tree, categoria2,Dataprazo, estado):
+
+    """
+    Função que cria o painel de criação de tarefa
+    """
     window_criacao = Toplevel() #Insere no topo do ecrã 
     window_criacao.title("Tarefas")
     x2 = (screenWidth/2) - (550/2)        # posição do canto superior esquerdo da window
@@ -336,8 +417,8 @@ def criarTarefa(window, tree, categoria2,Dataprazo):
     lbluser= Label(window_criacao,text= "USER",bg='#87CEFA', font=("helvetica", 8))
     lbluser.place(x=505, y=10)
 
-    lblcomentario= Label(window_criacao,text= "CONTEUDO",bg='#87CEFA', font=("helvetica", 8))
-    lblcomentario.place(x=7, y=110)
+    lblconteudo= Label(window_criacao,text= "CONTEUDO",bg='#87CEFA', font=("helvetica", 8))
+    lblconteudo.place(x=7, y=110)
 
     lblcategorias= Label(window_criacao,text= "CATEGORIAS",bg='#87CEFA', font=("helvetica", 8))
     lblcategorias.place(x=8, y=10)
@@ -372,11 +453,248 @@ def criarTarefa(window, tree, categoria2,Dataprazo):
     user.place(x=399, y=30)
     
     #Button
-    btn=Button(window_criacao, width=20, text="CRIAR TAREFA", command= lambda: [insertTarefa(user.get(),categorias.get(),txttitulo.get(), txtmain.get(1.0,END),"Iniciada",txtdatapz.get(),window_criacao, window),updateTreeview(tree, categoria2, Dataprazo)])
+    btn=Button(window_criacao, width=20, text="CRIAR TAREFA", command= lambda: [insertTarefa(user.get(),categorias.get(),txttitulo.get(), txtmain.get(1.0,END),"Iniciada",txtdatapz.get(),window_criacao, window),updateTreeview(tree, categoria2, Dataprazo,estado)])
     btn.place(x=395, y=245)
 
+def Encontrar_Edit(Selecionado_id):
+    """
+    Checker de clickado na teeview
+    """
+    shoresBruto = readShores()
+    Selecionado_counter = 0
+    for linhas in shoresBruto:
+        if userAutenticado.get() ==linhas.split(";")[2]:
+            Selecionado_counter += 1
+            if Selecionado_counter == Selecionado_id:
+                return linhas
+
+def DestroyWindow(window_destroy):
+    """
+    Destroi windo dada
+    """
+    window_destroy.destroy()
+
+def detalheTarefa(tree):
+    """
+    Painel de mostra detalhe da tarefa
+    """
+    Selecionado = tree.focus()
+    if Selecionado == "":
+        messagebox.showerror("Edição", "Nenhum item selecionado")
+        return
+    Selecionado =Selecionado.replace("I","")
+    Selecionado = int(Selecionado)
+    Linha=Encontrar_Edit(Selecionado)
+
+    
+    
+    window_atividade_detail = Toplevel()   # Objeto da classe Toplevel, janela principal
+    window_atividade_detail.title("Detalhes da Atividade")
+    window_atividade_detail.resizable(False,False)
+    appWidth_atividade_detail = 550                   
+    appHeight_atividade_detail = 300
+    screenWidth_atividade_detail = window_atividade_detail.winfo_screenwidth()
+    screenHeight_atividade_detail = window_atividade_detail.winfo_screenheight()
+    x_atividade_detail = (screenWidth_atividade_detail/2) - (appWidth_atividade_detail/2)
+    y_atividade_detail = (screenHeight_atividade_detail/2) - (appHeight_atividade_detail/2)
+    window_atividade_detail.geometry("{:.0f}x{:.0f}+{:.0f}+{:.0f}" .format(appWidth_atividade_detail, appHeight_atividade_detail, int(x_atividade_detail), int(y_atividade_detail)))
+    window_atividade_detail.focus_force()  # força o focus na window atual
+
+    # Label Titulo
+    labelTitulo_atividade_detail = Label(window_atividade_detail, text ="Titulo: ",font = ("Helvetica", "10"))
+    labelTitulo_atividade_detail.place(x=15, y= 62)
+    txtTitulo_atividade_detail_VARIAVEL = StringVar()
+    txtTitulo_atividade_detail_VARIAVEL.set(Linha.split(";")[6])
+    txtTitulo_atividade_detail = Entry(window_atividade_detail, width=25, textvariable=txtTitulo_atividade_detail_VARIAVEL, state="disable")
+    txtTitulo_atividade_detail.place(x=55, y= 65)
+    # Label DataLimite
+    labeldataLimite_atividade_detail = Label(window_atividade_detail, text ="Data Prazo: ",font = ("Helvetica", "10"))
+    labeldataLimite_atividade_detail.place(x=15, y= 197)
+    DataLimite = StringVar()
+    DataLimite.set(Linha.split(";")[4])
+    txtdataLimite_atividade_detail = Entry(window_atividade_detail, width=25, textvariable=DataLimite, state="disable")
+    txtdataLimite_atividade_detail.place(x=100, y= 200)
+    #conteudo
+    labelconteudo_atividade_detail = Label(window_atividade_detail, text ="Conteudo: ",font = ("Helvetica", "10"))
+    labelconteudo_atividade_detail.place(x=15, y= 102)
+    txtconteudo_atividade_detail = Text(window_atividade_detail, width=54,height=5)
+    txtconteudo_atividade_detail.place(x=100, y= 105)
+
+    conteudo = Linha.split(";")[7]
+    conteudo = "\n".join(str(conteudo).split("(/)"))
+    txtconteudo_atividade_detail.insert("end",conteudo)
+    txtconteudo_atividade_detail.configure(state="disable")
+
+    labeldrop = Label(window_atividade_detail, text ="Categoria:",font = ("Helvetica", "10"))
+    labeldrop.place(x=310, y= 58)
+
+    Categoria = StringVar()
+    Categoria.set(Linha.split(";")[5])
+    txtCat_atividade_detail = Entry(window_atividade_detail, width=25, textvariable=Categoria, state="disable")
+    txtCat_atividade_detail.place(x=380, y= 60)
+
+    labelText_Atividade_detail = Label(window_atividade_detail, text ="Detalhe da Atividade",font = ("Helvetica", "30"))
+    labelText_Atividade_detail.place(x=100 , y= 5)
+    
+    btnSair_atividade = Button(window_atividade_detail,image = imagemCloseNoti, width = 48, height = 48, command= lambda:DestroyWindow(window_atividade_detail))
+    btnSair_atividade.place(x=475, y=235)
+
+    btnEditar_Atividade = Button (window_atividade_detail,image = imgEditar, width = 48, height = 48, command= lambda:Editar_tarefa(Linha, window_atividade_detail,Linha.split(";")[5]))
+    btnEditar_Atividade.place(x=407 , y=235)
+
+    btnEleminar = Button(window_atividade_detail,image = imgEleminar, width = 48, height = 48, command= lambda:eliminateTarefa(Linha.split(";")[2],Linha.split(";")[6],Linha.split(";")[4],window_atividade_detail))
+    btnEleminar.place(x=339 , y=235)
+
+def getIndexCategoria(categoria):
+    """
+    Metodo para indicar o index presente no ficheiro categorias
+    """
+    texto = ReadFiles("Ficheiros\categorias.txt")
+    campos = str(texto).split(";")
+    for campo in campos:
+        if campo == categoria:
+            return (campos.index(campo))
+
+def Editar_tarefa(Linha, window_Atividade,categoriaDefault):
+    """
+    Aciona a edição da tarefa
+    """
+    window_Atividade.destroy()
+    window_atividade_Editar = Toplevel()   # Objeto da classe Toplevel, janela principal
+    window_atividade_Editar.title("Editar Atividade")
+    window_atividade_Editar.resizable(False,False)
+    appWidth_atividade_detail = 550                   
+    appHeight_atividade_detail = 300
+    screenWidth_atividade_detail = window_atividade_Editar.winfo_screenwidth()
+    screenHeight_atividade_detail = window_atividade_Editar.winfo_screenheight()
+    x_atividade_detail = (screenWidth_atividade_detail/2) - (appWidth_atividade_detail/2)
+    y_atividade_detail = (screenHeight_atividade_detail/2) - (appHeight_atividade_detail/2)
+    window_atividade_Editar.geometry("{:.0f}x{:.0f}+{:.0f}+{:.0f}" .format(appWidth_atividade_detail, appHeight_atividade_detail, int(x_atividade_detail), int(y_atividade_detail)))
+    window_atividade_Editar.focus_force()  # força o focus na window atual
+
+        # Label Titulo
+    labelTitulo_atividade_detail = Label(window_atividade_Editar, text ="Titulo: ",font = ("Helvetica", "10"))
+    labelTitulo_atividade_detail.place(x=15, y= 62)
+    txtTitulo_atividade_detail_VARIAVEL = StringVar()
+    txtTitulo_atividade_detail_VARIAVEL.set(Linha.split(";")[6])
+    txtTitulo_atividade_detail = Entry(window_atividade_Editar, width=25, textvariable=txtTitulo_atividade_detail_VARIAVEL)
+    txtTitulo_atividade_detail.place(x=55, y= 65)
+    # Label DataLimite
+    labeldataLimite_atividade_detail = Label(window_atividade_Editar, text ="Data Prazo: ",font = ("Helvetica", "10"))
+    labeldataLimite_atividade_detail.place(x=15, y= 197)
+    DataLimite = StringVar()
+    DataLimite.set(Linha.split(";")[4])
+    txtdataLimite_atividade_detail = Entry(window_atividade_Editar, width=25, textvariable=DataLimite)
+    txtdataLimite_atividade_detail.place(x=100, y= 200)
+    #conteudo
+    labelconteudo_atividade_detail = Label(window_atividade_Editar, text ="Conteudo: ",font = ("Helvetica", "10"))
+    labelconteudo_atividade_detail.place(x=15, y= 102)
+    txtconteudo_atividade_detail = Text(window_atividade_Editar, width=54,height=5)
+    txtconteudo_atividade_detail.place(x=100, y= 105)
+
+    conteudo = Linha.split(";")[7]
+    conteudo = "\n".join(str(conteudo).split("(/)"))
+    txtconteudo_atividade_detail.insert("end",conteudo)
+
+    labeldrop = Label(window_atividade_Editar, text ="Categoria:",font = ("Helvetica", "10"))
+    labeldrop.place(x=310, y= 58)
+
+    texto = ReadFiles("Ficheiros\categorias.txt")
+    categorias = str(texto[0]).split(";")
+    categoria = StringVar()
+    index = getIndexCategoria(categoriaDefault)
+    drop = ttk.Combobox(window_atividade_Editar, values=categorias, state="readonly",textvariable=categoria)
+    drop.place(x=380, y= 60)
+    drop.current(index)
+
+    labelText_Atividade_detail = Label(window_atividade_Editar, text ="Editar Atividade",font = ("Helvetica", "30"))
+    labelText_Atividade_detail.place(x=140 , y= 5)
+
+    Estados = LabelFrame(window_atividade_Editar, width=250, height=50, relief="sunken", text="Estado")
+    Estados.place(x= 15, y=220)
+
+    Radio_value = StringVar()
+    Radio_value.set(Linha.split(";")[3])
+    rd1= Radiobutton(Estados, text= "Iniciada", value= "Iniciada", variable=Radio_value)
+    rd2= Radiobutton(Estados, text= "Progresso", value= "Progresso", variable=Radio_value)
+    rd3= Radiobutton(Estados, text= "Finalizado", value= "Finalizado", variable=Radio_value)
+    rd1.place(x=10 , y=5)
+    rd2.place(x=80, y=5)
+    rd3.place(x=160, y=5)
+
+    btnConfirmar = Button (window_atividade_Editar,image = imgConfirmar, width = 48, height = 48, command=lambda:Editar_Atividade(Linha, txtTitulo_atividade_detail_VARIAVEL.get(),Radio_value.get(),categoria.get(),txtconteudo_atividade_detail.get(1.0,"end"), DataLimite.get(),window_atividade_Editar))
+    btnConfirmar.place(x=407 , y=235)
+
+    btnDiscard = Button(window_atividade_Editar,image = imgDiscard, width = 48, height = 48, command= lambda:DestroyWindow(window_atividade_Editar))
+    btnDiscard.place(x=475 , y=235)
+
+def Noti_criar(username):
+    """
+    Painel de notificação
+    """
+    panel_Noti = PanedWindow(ctnCanvas, width=250, height=300, relief="sunken")
+    panel_Noti.place(x=30, y=117)
+
+    btnNotificacoes.configure(state="disable")
+
+    btnSair = Button(ctnCanvas, image= imagemCloseNoti, width = 48, height = 48, command= lambda: FuncaoSair_noti(panel_Noti, btnSair))
+    btnSair.place(x=227, y=420)
+    Places = ["0","75","150","225"]
+    Texto_Shores = readShores()
+    today = date.today().strftime("%d-%m-%Y")
+    counter_4 = -1               #Counter de 4 posições para limitar numero de notificações
+    for linhas in Texto_Shores:
+        if username == linhas.split(";")[2] and linhas.split(";")[3].lower() != "finalizado":
+            if counter_4 != 3:
+                counter_4 += 1
+                if today > linhas.split(";")[4]:
+                        y1 = Places[counter_4]
+                        Paned_window1 =PanedWindow(panel_Noti, width=250, height=75,relief="sunken", bg="red")
+                        Paned_window1.place(x=0,y=y1 )
+
+                        Label_1=StringVar()
+                        Adder = "Titulo:  " + linhas.split(";")[6]
+                        Label_1.set(Adder)
+                        lbl_paned_1 = Label(Paned_window1, textvariable=Label_1, font=("Helvetica", "8"),bg="red")
+                        lbl_paned_1.place(x= 5, y=5)
+
+                        Label_Cat_1=StringVar()
+                        Adder = "Categoria:  " + linhas.split(";")[5]
+                        Label_Cat_1.set(Adder)
+                        lbl_panedCat_1 = Label(Paned_window1, textvariable=Label_Cat_1, font=("Helvetica", "8"),bg="red")
+                        lbl_panedCat_1.place(x= 5, y=25)
+
+                        Label_Data_1=StringVar()
+                        Adder = "Data Limite:  " + linhas.split(";")[4]
+                        Label_Data_1.set(Adder)
+                        lbl_panedData_1 = Label(Paned_window1, textvariable=Label_Data_1, font=("Helvetica", "8"),bg="red")
+                        lbl_panedData_1.place(x= 5, y=45)
+                if today == linhas.split(";")[4]:
+                        y1 = Places[counter_4]
+                        
+                        Paned_window1 =PanedWindow(panel_Noti, width=250, height=75,relief="sunken", bg="yellow")
+                        Paned_window1.place(x=0,y=y1 )
+
+                        Label_1=StringVar()
+                        Adder = "Titulo:  " + linhas.split(";")[6]
+                        Label_1.set(Adder)
+                        lbl_paned_1 = Label(Paned_window1, textvariable=Label_1, font=("Helvetica", "8"),bg="yellow")
+                        lbl_paned_1.place(x= 5, y=5)
+
+                        Label_Cat_1=StringVar()
+                        Adder = "Categoria:  " + linhas.split(";")[5]
+                        Label_Cat_1.set(Adder)
+                        lbl_panedCat_1 = Label(Paned_window1, textvariable=Label_Cat_1, font=("Helvetica", "8"),bg="yellow")
+                        lbl_panedCat_1.place(x= 5, y=25)
+
+                        Label_Data_1=StringVar()
+                        Adder = "Data Limite:  " + linhas.split(";")[4]
+                        Label_Data_1.set(Adder)
+                        lbl_panedData_1 = Label(Paned_window1, textvariable=Label_Data_1, font=("Helvetica", "8"),bg="yellow")
+                        lbl_panedData_1.place(x= 5, y=45)
 
 
+#main Page
 window = Tk()
 window.resizable(False,False)
 window.overrideredirect(True) 
@@ -420,8 +738,16 @@ panel2.place(x=0, y=98)
 ctnCanvas = Canvas(panel2, width = 1100, height= 600)
 ctnCanvas.place(x=0, y= 0)
 
+imagemNoti = PhotoImage(file="imagens\\NotiIcon.png")
+imagemCloseNoti = PhotoImage(file="imagens\\xIcon.png")
+imgFinalizar = PhotoImage(file="imagens\\CheckmarkIcon.png")
+imgEditar = PhotoImage(file="imagens\\EditarIcon.png")
+imgEleminar = PhotoImage(file="imagens\\EleminarIcon.png")
+imgDiscard = PhotoImage(file="imagens\\xIcon.png")
+imgConfirmar = PhotoImage(file="imagens\\CheckmarkIcon.png")
+
 global img
-img = PhotoImage(file = ".\imagens\\1100x600.png")
+img = PhotoImage(file = ".\imagens\\Background.png")
 ctnCanvas.create_image(550, 300, image = img)
 
 window.mainloop()
