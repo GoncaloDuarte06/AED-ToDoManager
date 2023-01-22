@@ -1,0 +1,4 @@
+10;22-01-2023 16:24:39;Admin;Iniciada;23-01-2023;Reunir;Reunião Final do Curso;Reuniao sobre o quao bom o trabalho é do Grupo 1
+11;22-01-2023 17:16:04;Admin;Iniciada;23-01-2023;Entrega de Trabalho;Entregar o Trabalho de AED;Temos de entregas as 10:00
+12;22-01-2023 17:32:32;Admin;Iniciada;24-01-2023;Trabalho;Trabalhar para o Bronze;Ir apanhar sol
+13;22-01-2023 19:21:14;Admin;Iniciada;22-01-2023;Barbeiro;Cortar;Cortar este cabelo
